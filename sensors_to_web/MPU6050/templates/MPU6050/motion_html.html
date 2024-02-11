@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            height: 40vh;
+            width: 80vw;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chart-container">
+    <canvas id="accelChart"></canvas>
+</div>
+<div class="chart-container">
+    <canvas id="gyroChart"></canvas>
+</div>
+
+<script>
+// Initialize empty data arrays
+var time_values = [0];
+var accel_x_values = [0];
+var accel_y_values = [0];
+var accel_z_values = [0];
+var gyro_x_values = [0];
+var gyro_y_values = [0];
+var gyro_z_values = [0];
+
+// Initialize a Chart.js graph for accelerometer data
+var accelCtx = document.getElementById('accelChart').getContext('2d');
+var accelChart = new Chart(accelCtx, {
+    type: 'line',
+    data: {
+        labels: time_values,
+        datasets: [
+            { data: accel_x_values, label: 'AccelX', borderColor: 'blue', fill: false },
+            { data: accel_y_values, label: 'AccelY', borderColor: 'red', fill: false },
+            { data: accel_z_values, label: 'AccelZ', borderColor: 'green', fill: false }
+        ]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: 'Accelerometer Data'
+        },
+        scales: {
+            x: {
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Time'
+                }
+            },
+            y: {
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Acceleration'
+                }
+            }
+        }
+    }
+});
+
+// Initialize a Chart.js graph for gyroscope data
+var gyroCtx = document.getElementById('gyroChart').getContext('2d');
+var gyroChart = new Chart(gyroCtx, {
+    type: 'line',
+    data: {
+        labels: time_values,
+        datasets: [
+            { data: gyro_x_values, label: 'GyroX', borderColor: 'yellow', fill: false },
+            { data: gyro_y_values, label: 'GyroY', borderColor: 'purple', fill: false },
+            { data: gyro_z_values, label: 'GyroZ', borderColor: 'orange', fill: false }
+        ]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: 'Gyroscope Data'
+        },
+        scales: {
+            x: {
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Time'
+                }
+            },
+            y: {
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Angular Velocity'
+                }
+            }
+        }
+    }
+});
+
+// Function to fetch data and update the plots
+function fetchDataAndUpdatePlot() {
+    fetch('/MPU6050/motion_data')
+        .then(response => response.json())
+        .then(data => {
+            // Update data arrays
+            time_values.push(time_values[time_values.length - 1] + 1);
+            accel_x_values.push(data.accel_x);
+            accel_y_values.push(data.accel_y);
+            accel_z_values.push(data.accel_z);
+            gyro_x_values.push(data.gyro_x);
+            gyro_y_values.push(data.gyro_y);
+            gyro_z_values.push(data.gyro_z);
+
+            // Update the plots with each individual data point
+            accelChart.update();
+            gyroChart.update();
+        })
+        .catch(error => console.error(error));
+}
+
+// Fetch data and update the plots every second
+setInterval(fetchDataAndUpdatePlot, 1000);
+</script>
+
+</body>
+</html>

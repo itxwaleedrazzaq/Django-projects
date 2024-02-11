@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Humidity Sensor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart"></canvas>
+
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    
+        var colors = ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 205, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(201, 203, 207, 0.2)'];
+        var borderColors = ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)', 'rgba(255, 159, 64, 1)', 'rgba(255, 205, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)', 'rgba(153, 102, 255, 1)', 'rgba(201, 203, 207, 1)'];
+    
+        function fetchData() {
+            fetch('/HumiditySensor/humidity_data/')
+                .then(response => response.json())
+                .then(data => {
+                    myChart.data.labels.push(new Date().toLocaleTimeString());
+                    var colorIndex = 0;
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key) && key !== "error") {
+                            var datasetIndex = myChart.data.datasets.findIndex(dataset => dataset.label === key);
+                            if (datasetIndex === -1) {
+                                myChart.data.datasets.push({
+                                    label: key,
+                                    data: [data[key]],
+                                    backgroundColor: colors[colorIndex],
+                                    borderColor: borderColors[colorIndex],
+                                    borderWidth: 1
+                                });
+                                colorIndex = (colorIndex + 1) % colors.length;
+                            } else {
+                                myChart.data.datasets[datasetIndex].data.push(data[key]);
+                            }
+                        }
+                    }
+                    myChart.update();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    
+        setInterval(fetchData, 1000);  
+    </script>
+    
+    
+    </body>
+</html>

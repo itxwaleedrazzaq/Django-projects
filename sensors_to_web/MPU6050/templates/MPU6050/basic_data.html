@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-Time Data</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .chart-container {
+            width: 50%;
+            height: 50vh;
+            float: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <canvas id="accelerationChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="rotationChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <canvas id="temperatureChart"></canvas>
+    </div>
+
+    <script>
+        var ctx1 = document.getElementById('accelerationChart').getContext('2d');
+        var ctx2 = document.getElementById('rotationChart').getContext('2d');
+        var ctx3 = document.getElementById('temperatureChart').getContext('2d');
+
+        var accelerationChart = new Chart(ctx1, {type: 'line', data: {labels: [], datasets: [{label: 'Acceleration X', data: [], borderColor: 'rgba(75, 192, 192, 1)'}, {label: 'Acceleration Y', data: [], borderColor: 'rgba(255, 99, 132, 1)'}, {label: 'Acceleration Z', data: [], borderColor: 'rgba(255, 205, 86, 1)'}]}});
+        var rotationChart = new Chart(ctx2, {type: 'line', data: {labels: [], datasets: [{label: 'Rotation X', data: [], borderColor: 'rgba(75, 192, 192, 1)'}, {label: 'Rotation Y', data: [], borderColor: 'rgba(255, 99, 132, 1)'}, {label: 'Rotation Z', data: [], borderColor: 'rgba(255, 205, 86, 1)'}]}});
+        var temperatureChart = new Chart(ctx3, {type: 'line', data: {labels: [], datasets: [{label: 'Temperature', data: [], borderColor: 'rgba(255, 159, 64, 1)'}]}});
+
+        function fetchData() {
+            $.ajax({
+                url: '/MPU6050/basic_data/',
+                success: function(data) {
+                    accelerationChart.data.labels.push(new Date().toLocaleTimeString());
+                    accelerationChart.data.datasets[0].data.push(data.acceleration_x);
+                    accelerationChart.data.datasets[1].data.push(data.acceleration_y);
+                    accelerationChart.data.datasets[2].data.push(data.acceleration_z);
+                    accelerationChart.update();
+
+                    rotationChart.data.labels.push(new Date().toLocaleTimeString());
+                    rotationChart.data.datasets[0].data.push(data.rotation_x);
+                    rotationChart.data.datasets[1].data.push(data.rotation_y);
+                    rotationChart.data.datasets[2].data.push(data.rotation_z);
+                    rotationChart.update();
+
+                    temperatureChart.data.labels.push(new Date().toLocaleTimeString());
+                    temperatureChart.data.datasets[0].data.push(data.temperature);
+                    temperatureChart.update();
+                }
+            });
+        }
+
+        setInterval(fetchData, 1000);  // Fetch data every second
+    </script>
+</body>
+</html>
