@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>web-to-servomotor</h1>
+
+    <form action="{% url 'servomotors:pan_tilt' %}" method="POST">
+        {% csrf_token %}
+        <label for="pan-angle">Enter Pan-angle!</label>
+        <input type="number" name="pan_angle" id="pan-angle" placeholder="Value from 0-180">
+        <br>
+        <label for="tilt-angle">Enter Tilt-angle!</label>
+        <input type="number" name="tilt_angle" id="tilt-angle" placeholder="Value from 0-180">
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+    
+</body>
+</html>
