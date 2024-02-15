@@ -26,5 +26,4 @@ This repository hosts two distinct Django projects, each serving specific functi
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/sensors-to-web.git
-   cd sensors-to-web
+   git clone https://github.com/itxwaleedrazzaq/Django-projects.git
